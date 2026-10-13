@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6d28d9">
+<title>Outreacher</title>
+<style>
+  :root {
+    --bg:#f5f3ff; --card:#ffffff; --ink:#1e1b2e; --muted:#6b6880; --line:#e6e2f5;
+    --brand:#6d28d9; --brand-d:#5b21b6; --brand-l:#ede9fe;
+    --ok:#15803d; --ok-l:#dcfce7; --bad:#b91c1c; --bad-l:#fee2e2; --warn:#b45309; --warn-l:#fef3c7;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  .hero { background:linear-gradient(135deg,#4c1d95,#6d28d9 60%,#8b5cf6); color:#fff; padding:22px 16px 56px; }
+  .wrap { max-width:860px; margin:0 auto; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .logo { width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,.18); display:grid; place-items:center; font-size:22px; }
+  .hero h1 { margin:0; font-size:22px; letter-spacing:-.01em; }
+  .hero p { margin:2px 0 0; opacity:.85; font-size:14px; }
+  main { max-width:860px; margin:-36px auto 0; padding:0 16px 70px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-top:14px; box-shadow:0 1px 2px rgba(76,29,149,.05), 0 8px 24px rgba(76,29,149,.06); }
+  .card h2 { margin:0 0 4px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .big { font-size:34px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
+  .grid4 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
+  @media (min-width:640px){ .grid4 { grid-template-columns:repeat(4,1fr); } }
+  .stat { background:var(--brand-l); border-radius:12px; padding:10px 12px; }
+  .stat b { display:block; font-size:22px; }
+  .stat span { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .stat.ok { background:var(--ok-l); } .stat.bad { background:var(--bad-l); }
+  label { display:block; font-weight:600; margin:12px 0 4px; font-size:14px; }
+  input[type=text], input[type=number], select, textarea { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:#fff; color:var(--ink); }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--brand); outline-offset:0; border-color:var(--brand); }
+  textarea { min-height:170px; resize:vertical; }
+  button { background:var(--brand); color:#fff; border:0; padding:10px 16px; border-radius:10px; font:inherit; font-weight:600; cursor:pointer; }
+  button:hover { background:var(--brand-d); }
+  button.sec { background:var(--brand-l); color:var(--brand); }
+  button.sec:hover { background:#ddd6fe; }
+  button.danger { background:var(--bad-l); color:var(--bad); }
+  button.sm { padding:6px 12px; font-size:13px; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .muted { color:var(--muted); font-size:13px; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .tab { background:#f3f1fb; color:var(--muted); padding:6px 14px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; border:0; }
+  .tab.on { background:var(--brand); color:#fff; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 2px; }
+  .chip { background:var(--brand-l); color:var(--brand); border-radius:999px; padding:3px 10px; font-size:13px; border:0; font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+  .tw { overflow-x:auto; margin-top:8px; }
+  .preview { background:#faf9ff; border:1px dashed #cfc7ee; border-radius:12px; padding:12px; white-space:pre-wrap; margin-top:8px; }
+  .bar { height:10px; background:var(--brand-l); border-radius:999px; overflow:hidden; margin:12px 0 6px; }
+  .bar > div { height:100%; background:linear-gradient(90deg,#6d28d9,#a78bfa); width:0; transition:width .3s; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); }
+  .banner { padding:10px 12px; border-radius:12px; margin-top:14px; font-size:14px; background:var(--warn-l); color:var(--warn); }
+  .hidden { display:none; }
+  #drop { display:block; border:2px dashed #cfc7ee; border-radius:12px; padding:22px; text-align:center; color:var(--muted); cursor:pointer; background:#faf9ff; }
+  .sr { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
+  #drop.over { border-color:var(--brand); background:var(--brand-l); }
+  .toggle { display:flex; gap:10px; align-items:flex-start; }
+  .toggle input { width:18px; height:18px; margin-top:3px; accent-color:var(--brand); }
+  .spam { margin-top:10px; padding:10px 12px; border-radius:12px; font-size:14px; }
+  .spam.good { background:var(--ok-l); color:var(--ok); } .spam.meh { background:var(--warn-l); color:var(--warn); } .spam.risk { background:var(--bad-l); color:var(--bad); }
+  .spam ul { margin:6px 0 0; padding-left:18px; }
+  .bars { display:flex; align-items:flex-end; gap:6px; height:90px; margin-top:12px; }
+  .bars div { flex:1; background:linear-gradient(180deg,#8b5cf6,#6d28d9); border-radius:6px 6px 0 0; min-height:3px; position:relative; }
+  .bars div span { position:absolute; bottom:-18px; left:0; right:0; text-align:center; font-size:10px; color:var(--muted); }
+  .bars-wrap { padding-bottom:20px; }
+</style>
+</head>
+<body>
+<div class="hero"><div class="wrap">
+  <div class="brand">
+    <div class="logo">✉️</div>
+    <div><h1>Outreacher</h1><p>Send personalised emails to your clients in a few clicks</p></div>
+  </div>
+</div></div>
+
+<main>
+  <div id="cfgWarn" class="banner hidden">Email isn't set up yet. Copy <b>.env.example</b> to <b>.env</b>, fill in your email details, and restart the server. You can still upload and preview.</div>
+
+  <section class="card">
+    <div class="head"><h2>1 · Recipients</h2><button class="danger sm" id="clearBtn">Clear all</button></div>
+    <label id="drop" for="file">Tap to choose a CSV file, or drag it here</label>
+    <input id="file" type="file" accept=".csv,.txt,text/csv,text/plain,application/vnd.ms-excel" class="sr">
+    <div id="fileInfo" class="muted" style="margin-top:8px"></div>
+    <div id="tableBox" class="tw"></div>
+    <div id="emailColBox" class="hidden">
+      <label for="emailCol">Which column has the email address?</label>
+      <select id="emailCol"></select>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>2 · Messages</h2><span class="muted">Add several and they take turns</span></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="chips" class="chips"></div>
+    <label for="subject">Subject</label>
+    <input id="subject" type="text" placeholder="A quick note for {{name}}">
+    <label for="body">Message</label>
+    <textarea id="body" placeholder="Hi {{name}},&#10;&#10;I wanted to reach out about...&#10;&#10;Best,&#10;Your Name"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="sec sm" id="spamBtn">Spam check</button>
+      <button class="sec sm" id="saveBtn">Save</button>
+      <button class="sec sm" id="loadBtn">Load</button>
+      <button class="danger sm" id="delTabBtn">Delete message</button>
+    </div>
+    <div id="spamOut"></div>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>3 · Preview</h2>
+      <div class="row"><button class="sec sm" id="prevBtn">←</button><span id="prevCount" class="muted">No recipients</span><button class="sec sm" id="nextBtn">→</button></div>
+    </div>
+    <div id="prevTo" class="muted"></div>
+    <div id="prevSubject" style="font-weight:700;margin-top:4px"></div>
+    <div id="prevBody" class="preview">Upload a file and write a message to see a preview.</div>
+  </section>
+
+  <section class="card">
+    <h2>4 · Send</h2>
+    <div class="grid4">
+      <div class="stat"><b id="sTotal">0</b><span>Recipients</span></div>
+      <div class="stat ok"><b id="sSent">0</b><span>Sent</span></div>
+      <div class="stat bad"><b id="sFail">0</b><span>Failed / skipped</span></div>
+      <div class="stat"><b id="sLeft">0</b><span>Remaining</span></div>
+    </div>
+    <label for="delay">Seconds between emails</label>
+    <input id="delay" type="number" min="0" value="3">
+    <div class="toggle" style="margin-top:12px">
+      <input type="checkbox" id="confirmTog" checked>
+      <div><b>Ask me to confirm before sending</b><div class="muted">Shows a final check so nothing goes out by accident.</div></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="sendBtn" disabled>Send emails</button>
+      <button id="cancelBtn" class="danger hidden">Stop</button>
+    </div>
+    <div id="progress" class="hidden">
+      <div class="bar"><div id="barFill"></div></div>
+      <div id="progText" class="muted"></div>
+      <div class="tw"><table id="logTable"><thead><tr><th>Email</th><th>Status</th><th>Details</th></tr></thead><tbody></tbody></table></div>
+      <button class="sec sm" id="dlLog" style="margin-top:10px">Download log (CSV)</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>Activity</h2>
+      <div class="tabs" style="margin:0" id="actTabs">
+        <button class="tab on" data-r="week">Week</button><button class="tab" data-r="month">Month</button><button class="tab" data-r="year">Year</button>
+      </div>
+    </div>
+    <div class="big" id="actTotal">0</div>
+    <div class="muted" id="actLabel">emails sent this week</div>
+    <div class="bars-wrap"><div class="bars" id="actBars"></div></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let headers = [], rows = [], idx = 0, jobId = null, poll = null, lastLog = [], counted = 0;
+let msgs = [{ subject: '', body: '' }], cur = 0, lastFocus = $('body');
+
+/* ---------- CSV ---------- */
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const out = []; let row = [], c1 = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"' && text[i+1] === '"') { c1 += '"'; i++; } else if (c === '"') q = false; else c1 += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(c1); c1 = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i+1] === '\n') i++;
+      row.push(c1); c1 = '';
+      if (row.some((v) => v.trim() !== '')) out.push(row);
+      row = [];
+    } else c1 += c;
+  }
+  row.push(c1);
+  if (row.some((v) => v.trim() !== '')) out.push(row);
+  return out;
+}
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = parseCSV(reader.result);
+    if (data.length < 2) { $('fileInfo').textContent = 'That file looks empty.'; return; }
+    headers = data[0].map((h) => h.trim());
+    rows = data.slice(1).map((r) => Object.fromEntries(headers.map((h, i) => [h, (r[i] ?? '').trim()])));
+    idx = 0;
+    $('fileInfo').textContent = `${file.name}: ${rows.length} rows, ${headers.length} columns`;
+    renderTable(); renderChips(); renderEmailCol(); updatePreview(); updateStats();
+  };
+  reader.readAsText(file);
+}
+function renderTable() {
+  const show = rows.slice(0, 5);
+  $('tableBox').innerHTML = '<table><thead><tr>' + headers.map((h) => `<th>${esc(h)}</th>`).join('') + '</tr></thead><tbody>' +
+    show.map((r) => '<tr>' + headers.map((h) => `<td>${esc(r[h])}</td>`).join('') + '</tr>').join('') + '</tbody></table>' +
+    (rows.length > 5 ? `<div class="muted" style="margin-top:6px">Showing first 5 of ${rows.length} rows</div>` : '');
+}
+function renderEmailCol() {
+  $('emailColBox').classList.remove('hidden');
+  $('emailCol').innerHTML = headers.map((h) => `<option>${esc(h)}</option>`).join('');
+  const g = headers.find((h) => /e-?mail/i.test(h)); if (g) $('emailCol').value = g;
+  $('emailCol').onchange = updatePreview;
+}
+$('file').onchange = (e) => e.target.files[0] && loadFile(e.target.files[0]);
+['dragover', 'dragenter'].forEach((ev) => $('drop').addEventListener(ev, (e) => { e.preventDefault(); $('drop').classList.add('over'); }));
+['dragleave', 'drop'].forEach((ev) => $('drop').addEventListener(ev, (e) => { e.preventDefault(); $('drop').classList.remove('over'); }));
+$('drop').addEventListener('drop', (e) => e.dataTransfer.files[0] && loadFile(e.dataTransfer.files[0]));
+$('clearBtn').onclick = () => {
+  if (!confirm('Clear the recipients and all messages?')) return;
+  headers = []; rows = []; idx = 0; msgs = [{ subject: '', body: '' }]; cur = 0;
+  $('file').value = ''; $('fileInfo').textContent = ''; $('tableBox').innerHTML = ''; $('emailColBox').classList.add('hidden'); $('chips').innerHTML = '';
+  $('spamOut').innerHTML = ''; renderTabs(); updatePreview(); updateStats();
+};
+
+/* ---------- Message tabs ---------- */
+function saveCurrent() { msgs[cur] = { subject: $('subject').value, body: $('body').value }; }
+function renderTabs() {
+  $('tabs').innerHTML = '';
+  msgs.forEach((m, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab' + (i === cur ? ' on' : ''); b.textContent = 'Message ' + (i + 1);
+    b.onclick = () => { saveCurrent(); cur = i; renderTabs(); updatePreview(); };
+    $('tabs').appendChild(b);
+  });
+  const add = document.createElement('button'); add.className = 'tab'; add.textContent = '+ Add';
+  add.onclick = () => { saveCurrent(); msgs.push({ subject: '', body: '' }); cur = msgs.length - 1; renderTabs(); updatePreview(); };
+  $('tabs').appendChild(add);
+  $('subject').value = msgs[cur].subject; $('body').value = msgs[cur].body;
+}
+$('delTabBtn').onclick = () => {
+  if (msgs.length === 1) { msgs[0] = { subject: '', body: '' }; } else { msgs.splice(cur, 1); cur = Math.max(0, cur - 1); }
+  renderTabs(); updatePreview();
+};
+$('subject').addEventListener('focus', () => lastFocus = $('subject'));
+$('body').addEventListener('focus', () => lastFocus = $('body'));
+function renderChips() {
+  $('chips').innerHTML = '';
+  headers.forEach((h) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = h;
+    b.onclick = () => {
+      const el = lastFocus, tag = `{{${h}}}`;
+      const s = el.selectionStart ?? el.value.length, e = el.selectionEnd ?? el.value.length;
+      el.value = el.value.slice(0, s) + tag + el.value.slice(e);
+      el.focus(); el.selectionStart = el.selectionEnd = s + tag.length; updatePreview();
+    };
+    $('chips').appendChild(b);
+  });
+}
+
+/* ---------- Save / Load ---------- */
+$('saveBtn').onclick = () => {
+  saveCurrent();
+  if (!msgs[cur].subject.trim() && !msgs[cur].body.trim()) return alert('Write a message first.');
+  const name = prompt('Name this message:', msgs[cur].subject.slice(0, 30) || 'My message');
+  if (!name) return;
+  const saved = store.get('saved', []).filter((s) => s.name !== name);
+  saved.push({ name, ...msgs[cur] }); store.set('saved', saved); alert('Saved.');
+};
+$('loadBtn').onclick = () => {
+  const saved = store.get('saved', []);
+  if (!saved.length) return alert('Nothing saved yet.');
+  const pick = prompt('Type the number to load:\n' + saved.map((s, i) => `${i + 1}. ${s.name}`).join('\n'));
+  const s = saved[Number(pick) - 1]; if (!s) return;
+  msgs[cur] = { subject: s.subject, body: s.body }; renderTabs(); updatePreview();
+};
+
+/* ---------- Spam check ---------- */
+$('spamBtn').onclick = () => {
+  const sub = $('subject').value, body = $('body').value, issues = [];
+  const all = sub + ' ' + body;
+  const words = ['free', 'winner', 'guarantee', 'act now', 'urgent', 'click here', 'limited time', 'no obligation', 'risk free', 'cash', '100%', 'buy now', 'congratulations'];
+  const hit = words.filter((w) => all.toLowerCase().includes(w));
+  if (hit.length) issues.push('Spammy words: ' + hit.join(', '));
+  if (sub && sub === sub.toUpperCase() && /[A-Z]/.test(sub)) issues.push('Subject is all capitals.');
+  if ((all.match(/!/g) || []).length > 2) issues.push('Too many exclamation marks.');
+  if ((body.match(/https?:\/\//g) || []).length > 2) issues.push('Many links in one email.');
+  if (!sub.trim()) issues.push('Subject is empty.');
+  if (body.trim().length < 40) issues.push('Message is very short.');
+  if (!/\{\{/.test(all)) issues.push('No personalisation. Try adding {{name}}.');
+  if (!/unsubscribe|opt.?out|stop/i.test(body)) issues.push('No way to opt out. Add a line such as "Reply STOP if you would rather not hear from me."');
+  const cls = issues.length === 0 ? 'good' : issues.length < 3 ? 'meh' : 'risk';
+  const title = issues.length === 0 ? 'Looks good.' : issues.length < 3 ? 'Mostly fine, a few things to improve:' : 'Likely to be flagged. Please fix:';
+  $('spamOut').innerHTML = `<div class="spam ${cls}"><b>${title}</b>${issues.length ? '<ul>' + issues.map((i) => `<li>${esc(i)}</li>`).join('') + '</ul>' : ''}</div>`;
+};
+
+/* ---------- Preview ---------- */
+function fill(t, row) {
+  return t.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_, k) => { const h = headers.find((x) => x.toLowerCase() === k.toLowerCase()); return h ? row[h] : ''; });
+}
+function updatePreview() {
+  const s = $('subject').value, b = $('body').value;
+  $('sendBtn').disabled = !rows.length || !msgs.some((m, i) => (i === cur ? s : m.subject).trim() && (i === cur ? b : m.body).trim());
+  if (!rows.length) { $('prevCount').textContent = 'No recipients'; return; }
+  const r = rows[idx];
+  $('prevCount').textContent = `${idx + 1} of ${rows.length}`;
+  $('prevTo').textContent = 'To: ' + (r[$('emailCol').value] || '(no email)');
+  $('prevSubject').textContent = fill(s, r) || '(no subject)';
+  $('prevBody').textContent = fill(b, r) || '(empty message)';
+}
+$('prevBtn').onclick = () => { if (rows.length) { idx = (idx - 1 + rows.length) % rows.length; updatePreview(); } };
+$('nextBtn').onclick = () => { if (rows.length) { idx = (idx + 1) % rows.length; updatePreview(); } };
+$('subject').addEventListener('input', updatePreview);
+$('body').addEventListener('input', updatePreview);
+
+/* ---------- Stats & sending ---------- */
+function updateStats(j) {
+  $('sTotal').textContent = rows.length;
+  $('sSent').textContent = j ? j.sent : 0;
+  $('sFail').textContent = j ? j.failed : 0;
+  $('sLeft').textContent = j ? Math.max(0, j.total - j.done) : rows.length;
+}
+$('sendBtn').onclick = async () => {
+  saveCurrent();
+  const templates = msgs.filter((m) => m.subject.trim() && m.body.trim());
+  if (!rows.length || !templates.length) return alert('Add recipients and a message first.');
+  if ($('confirmTog').checked && !confirm(`Send to ${rows.length} recipients using ${templates.length} message${templates.length > 1 ? 's' : ''}?`)) return;
+  $('sendBtn').disabled = true; counted = 0;
+  const res = await fetch('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipients: rows, templates, delaySeconds: $('delay').value, emailColumn: $('emailCol').value }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.error || 'Could not start sending.'); $('sendBtn').disabled = false; return; }
+  jobId = data.jobId; $('progress').classList.remove('hidden'); $('cancelBtn').classList.remove('hidden');
+  poll = setInterval(checkStatus, 1000); checkStatus();
+};
+async function checkStatus() {
+  const j = await (await fetch('/api/status/' + jobId)).json();
+  lastLog = j.log; updateStats(j);
+  $('barFill').style.width = (j.done / j.total * 100) + '%';
+  $('progText').innerHTML = `${j.done} of ${j.total} processed · ${esc(j.status)}`;
+  $('logTable').tBodies[0].innerHTML = j.log.slice().reverse().map((l) =>
+    `<tr><td>${esc(l.email) || '-'}</td><td class="${l.status === 'sent' ? 'ok' : 'bad'}">${esc(l.status)}</td><td>${esc(l.detail)}</td></tr>`).join('');
+  if (j.sent > counted) { recordSent(j.sent - counted); counted = j.sent; }
+  if (j.status !== 'running') { clearInterval(poll); $('cancelBtn').classList.add('hidden'); $('sendBtn').disabled = false; }
+}
+$('cancelBtn').onclick = () => fetch('/api/cancel/' + jobId, { method: 'POST' });
+$('dlLog').onclick = () => {
+  const csv = 'email,status,detail\n' + lastLog.map((l) => [l.email, l.status, l.detail].map((v) => `"${String(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'send-log.csv'; a.click();
+};
+
+/* ---------- Activity ---------- */
+let range = 'week';
+const dayKey = (d) => d.toISOString().slice(0, 10);
+function recordSent(n) { const a = store.get('activity', {}); const k = dayKey(new Date()); a[k] = (a[k] || 0) + n; store.set('activity', a); renderActivity(); }
+function renderActivity() {
+  const a = store.get('activity', {}), now = new Date(); let buckets = [];
+  if (range === 'year') {
+    for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); const p = d.toISOString().slice(0, 7);
+      buckets.push({ l: d.toLocaleString('en', { month: 'short' }).slice(0, 1), v: Object.entries(a).filter(([k]) => k.startsWith(p)).reduce((s, [, v]) => s + v, 0) }); }
+  } else {
+    const n = range === 'week' ? 7 : 30;
+    for (let i = n - 1; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate() - i);
+      buckets.push({ l: range === 'week' ? d.toLocaleString('en', { weekday: 'short' }).slice(0, 2) : (i % 5 === 0 ? d.getDate() : ''), v: a[dayKey(d)] || 0 }); }
+  }
+  const max = Math.max(1, ...buckets.map((b) => b.v));
+  $('actTotal').textContent = buckets.reduce((s, b) => s + b.v, 0);
+  $('actLabel').textContent = `emails sent in the last ${range === 'week' ? '7 days' : range === 'month' ? '30 days' : '12 months'}`;
+  $('actBars').innerHTML = buckets.map((b) => `<div style="height:${Math.max(3, b.v / max * 100)}%" title="${b.v}"><span>${b.l}</span></div>`).join('');
+}
+document.querySelectorAll('#actTabs .tab').forEach((t) => t.onclick = () => {
+  document.querySelectorAll('#actTabs .tab').forEach((x) => x.classList.remove('on')); t.classList.add('on'); range = t.dataset.r; renderActivity();
+});
+
+renderTabs(); renderActivity(); updateStats();
+fetch('/api/config').then((r) => r.json()).then((c) => { if (!c.configured) $('cfgWarn').classList.remove('hidden'); });
+</script>
+</body>
+</html>
